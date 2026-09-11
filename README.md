@@ -105,91 +105,98 @@ docker-compose up --build
 ### 📁 Project Structure
 
 aapadmitra/
-├── README.md
-├── docker-compose.yml
-├── .gitignore
-├── LICENSE
-├── data/
-│   ├── raw/rainfall_data.csv
-│   ├── raw/water_level_data.csv
-│   ├── raw/topography_data.csv
-│   ├── raw/landcover_data.csv
-│   ├── raw/historical_flood_data.csv
-│   ├── raw/village_demographics.csv
-│   ├── raw/soil_data.csv
-│   ├── raw/river_data.csv
-│   ├── raw/infrastructure_data.csv
-│   ├── raw/rescue_resources.csv
-│   ├── raw/weather_forecast_data.csv
-│   ├── raw/predictions.csv
-│   ├── raw/station_master_reference.csv
-│   ├── raw/cwc_station_reference.csv
-│   ├── processed/flood_training_feature_store.csv
-│   └── demo/
-├── backend/
-│   ├── requirements.txt
-│   ├── Dockerfile
-│   ├── app/main.py
-│   ├── app/config.py
-│   ├── app/api/sanket.py
-│   ├── app/api/marg.py
-│   ├── app/api/sahay.py
-│   ├── app/api/rahat.py
-│   ├── app/api/smriti.py
-│   ├── app/api/setucore.py
-│   ├── app/api/chetna.py
-│   ├── app/api/sahayak.py
-│   ├── app/api/awaaz.py
-│   ├── app/api/punarvas.py
-│   ├── app/api/disha.py
-│   ├── app/api/drishti.py
-│   └── tests/test_api.py
-├── frontend/
-│   ├── package.json
-│   ├── Dockerfile
-│   ├── src/App.jsx
-│   ├── src/App.css
-│   ├── src/pages/Drishti.jsx
-│   ├── src/pages/Sanket.jsx
-│   ├── src/pages/Marg.jsx
-│   ├── src/pages/Sahay.jsx
-│   ├── src/pages/Rahat.jsx
-│   ├── src/pages/Smriti.jsx
-│   ├── src/pages/SetuCore.jsx
-│   ├── src/pages/Chetna.jsx
-│   ├── src/pages/Sahayak.jsx
-│   ├── src/pages/Awaaz.jsx
-│   ├── src/pages/Punarvas.jsx
-│   └── src/pages/Disha.jsx
-├── ml/
-│   ├── data_generation/synthetic_data_generator.py
-│   ├── data_generation/feature_store_generator.py
-│   ├── training/train_baselines.py
-│   ├── training/train_physics_mlp.py
-│   ├── evaluation/validation_tests.py
-│   ├── evaluation/validation_figures.py
-│   ├── explainability/shap_analysis.py
-│   └── artifacts/
-│       ├── LogisticRegression.pkl
-│       ├── RandomForest.pkl
-│       ├── XGBoost.pkl
-│       ├── physics_mlp.pth
-│       ├── scaler.pkl
-│       └── feature_names.pkl
-├── results/
-│   ├── metrics/baseline_results.csv
-│   ├── metrics/physics_mlp_results.csv
-│   ├── metrics/validation_results.csv
-│   ├── metrics/feature_importance.csv
-│   ├── metrics/all_models_comparison.csv
-│   ├── figures/feature_importance.png
-│   ├── figures/feature_importance_comparison.png
-│   ├── figures/model_comparison.png
-│   └── figures/validation_results.png
-└── docs/
-    ├── paper/
-    ├── architecture/
-    └── api/
+|
++-- README.md
++-- docker-compose.yml
++-- .gitignore
++-- LICENSE
+|
++-- data/
+|   +-- raw/rainfall_data.csv
+|   +-- raw/water_level_data.csv
+|   +-- raw/topography_data.csv
+|   +-- raw/landcover_data.csv
+|   +-- raw/historical_flood_data.csv
+|   +-- raw/village_demographics.csv
+|   +-- raw/soil_data.csv
+|   +-- raw/river_data.csv
+|   +-- raw/infrastructure_data.csv
+|   +-- raw/rescue_resources.csv
+|   +-- raw/weather_forecast_data.csv
+|   +-- raw/predictions.csv
+|   +-- raw/station_master_reference.csv
+|   +-- raw/cwc_station_reference.csv
+|   +-- processed/flood_training_feature_store.csv
+|   +-- demo/
+|
++-- backend/
+|   +-- requirements.txt
+|   +-- Dockerfile
+|   +-- app/main.py
+|   +-- app/config.py
+|   +-- app/api/sanket.py
+|   +-- app/api/marg.py
+|   +-- app/api/sahay.py
+|   +-- app/api/rahat.py
+|   +-- app/api/smriti.py
+|   +-- app/api/setucore.py
+|   +-- app/api/chetna.py
+|   +-- app/api/sahayak.py
+|   +-- app/api/awaaz.py
+|   +-- app/api/punarvas.py
+|   +-- app/api/disha.py
+|   +-- app/api/drishti.py
+|   +-- tests/test_api.py
+|
++-- frontend/
+|   +-- package.json
+|   +-- Dockerfile
+|   +-- src/App.jsx
+|   +-- src/App.css
+|   +-- src/pages/Drishti.jsx
+|   +-- src/pages/Sanket.jsx
+|   +-- src/pages/Marg.jsx
+|   +-- src/pages/Sahay.jsx
+|   +-- src/pages/Rahat.jsx
+|   +-- src/pages/Smriti.jsx
+|   +-- src/pages/SetuCore.jsx
+|   +-- src/pages/Chetna.jsx
+|   +-- src/pages/Sahayak.jsx
+|   +-- src/pages/Awaaz.jsx
+|   +-- src/pages/Punarvas.jsx
+|   +-- src/pages/Disha.jsx
+|
++-- ml/
+|   +-- data_generation/synthetic_data_generator.py
+|   +-- data_generation/feature_store_generator.py
+|   +-- training/train_baselines.py
+|   +-- training/train_physics_mlp.py
+|   +-- evaluation/validation_tests.py
+|   +-- evaluation/validation_figures.py
+|   +-- explainability/shap_analysis.py
+|   +-- artifacts/
+|       +-- LogisticRegression.pkl
+|       +-- RandomForest.pkl
+|       +-- XGBoost.pkl
+|       +-- physics_mlp.pth
+|       +-- scaler.pkl
+|       +-- feature_names.pkl
+|
++-- results/
+|   +-- metrics/baseline_results.csv
+|   +-- metrics/physics_mlp_results.csv
+|   +-- metrics/validation_results.csv
+|   +-- metrics/feature_importance.csv
+|   +-- metrics/all_models_comparison.csv
+|   +-- figures/feature_importance.png
+|   +-- figures/feature_importance_comparison.png
+|   +-- figures/model_comparison.png
+|   +-- figures/validation_results.png
+|
++-- docs/
+    +-- paper/
+    +-- architecture/
+    +-- api/
 
 ### 🧪 Testing
 
