@@ -86,13 +86,12 @@ Existing systems fail because:
 
 ### Backend Setup
 
-```bash
 cd backend
 pip install -r requirements.txt
 python -m uvicorn app.main:app --reload
 Backend runs on: http://localhost:8000
 
-Frontend Setup
+### Frontend Setup
 
 cd frontend
 npm install
@@ -100,10 +99,10 @@ npm run dev
 
 Frontend runs on: http://localhost:5173
 
-Docker Setup
+### Docker Setup
 docker-compose up --build
 
-📁 Project Structure
+### 📁 Project Structure
 
 aapadmitra/
 │
@@ -156,13 +155,13 @@ aapadmitra/
 ├── .gitignore
 └── LICENSE
 
-🧪 Testing
+### 🧪 Testing
 
 cd backend
 python -m pytest tests/ -v
 9/9 tests passing ✅
 
-📊 Data
+### 📊 Data
 14 Synthetic Datasets
 rainfall_data.csv
 
@@ -192,14 +191,14 @@ station_master_reference.csv
 
 cwc_station_reference.csv
 
-Feature Store
+### Feature Store
 flood_training_feature_store.csv — 7,512 rows
 
 Train: 5,008 | Validation: 1,252 | Test: 1,252
 
 Labels: Balanced (50/50 split)
 
-🔬 Research Backing
+### 🔬 Research Backing
 Aapadmitra addresses gaps identified in 7+ peer-reviewed papers:
 
 Paper	Key Insight
@@ -211,7 +210,7 @@ Kumar et al. (2026)	SHAP validates interpretability
 Rijal et al. (2026)	Hybrid AI-physics recommended
 Arinze et al. (2025)	End-to-end systems validated
 
-🏆 Competitive Advantages
+### 🏆 Competitive Advantages
 
 Feature	Existing	Aapadmitra
 Level	District/Station	Village-Level ✅
@@ -221,22 +220,22 @@ Physics	❌ None	Physics-Guided MLP ✅
 Explainability	❌ None	Feature Importance ✅
 End-to-End	❌ None	Prediction → Action ✅
 
-📅 Built For
+### 📅 Built For
 SIH 2026 — Smart India Hackathon
 
 Team: 6 Members
 Deadline: 16 September 2026
 
-🗺️ Post-Hackathon Roadmap
+### 🗺️ Post-Hackathon Roadmap
 Phase	Timeline	Activity
 Phase 1	1-3 Months	Real data integration (IMD/CWC)
 Phase 2	3-6 Months	Pilot in 1 Assam district
 Phase 3	6-12 Months	Scale with ASDMA
 
-👤 License
+### 👤 License
 MIT
 
-🙏 Acknowledgments
+### 🙏 Acknowledgments
 Built as a research prototype exploring physics-guided machine learning for flood prediction. All data is synthetic and created for research purposes.
 
 Last Updated: 11 September 2026
