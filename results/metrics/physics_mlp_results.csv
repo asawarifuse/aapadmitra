@@ -1,0 +1,2 @@
+Model,Accuracy,Precision,Recall,F1,ROC-AUC
+Physics-Guided MLP,0.5783,0.5686,0.609,0.5881,0.5961

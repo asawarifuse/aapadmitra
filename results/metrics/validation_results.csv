@@ -1,0 +1,4 @@
+Test,Accuracy,F1,ROC-AUC,Train Size,Test Size,Holdout District,Threshold
+Temporal Validation,0.5719,0.5607,0.594,5008.0,1252,,
+Cross-District Validation,0.5833,0.5798,0.5858,7032.0,480,Barpeta,
+Extreme Event (95th percentile),0.6366,0.7601,0.5748,,377,,76.36
