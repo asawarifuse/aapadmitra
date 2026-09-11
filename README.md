@@ -87,15 +87,15 @@ Existing systems fail because:
 ### Backend Setup
 
 cd backend
-pip install -r requirements.txt
-python -m uvicorn app.main:app --reload
-Backend runs on: http://localhost:8000
+- pip install -r requirements.txt
+- python -m uvicorn app.main:app --reload
+- Backend runs on: http://localhost:8000
 
 ### Frontend Setup
 
-cd frontend
-npm install
-npm run dev
+- cd frontend
+- npm install
+- npm run dev
 
 Frontend runs on: http://localhost:5173
 
@@ -105,61 +105,97 @@ docker-compose up --build
 ### 📁 Project Structure
 
 aapadmitra/
-│
-├── data/
-│   ├── raw/              # 14 synthetic CSV files
-│   ├── processed/        # Feature store
-│   └── demo/             # Runtime fixtures
-│
-├── backend/
-│   ├── app/
-│   │   ├── main.py
-│   │   ├── api/          # 12 module APIs
-│   │   ├── services/
-│   │   ├── models/
-│   │   ├── schemas/
-│   │   └── utils/
-│   ├── tests/
-│   ├── requirements.txt
-│   └── Dockerfile
-│
-├── frontend/
-│   ├── src/
-│   │   ├── pages/        # 12 module pages
-│   │   ├── components/
-│   │   ├── services/
-│   │   └── styles/
-│   ├── package.json
-│   └── Dockerfile
-│
-├── ml/
-│   ├── data_generation/
-│   ├── feature_engineering/
-│   ├── training/
-│   ├── evaluation/
-│   ├── explainability/
-│   └── artifacts/        # Saved models
-│
-├── results/
-│   ├── figures/          # SHAP plots, validation charts
-│   ├── tables/
-│   └── metrics/          # CSV results
-│
-├── docs/
-│   ├── paper/
-│   ├── architecture/
-│   └── api/
-│
-├── docker-compose.yml
 ├── README.md
+├── docker-compose.yml
 ├── .gitignore
-└── LICENSE
+├── LICENSE
+├── data/
+│   ├── raw/rainfall_data.csv
+│   ├── raw/water_level_data.csv
+│   ├── raw/topography_data.csv
+│   ├── raw/landcover_data.csv
+│   ├── raw/historical_flood_data.csv
+│   ├── raw/village_demographics.csv
+│   ├── raw/soil_data.csv
+│   ├── raw/river_data.csv
+│   ├── raw/infrastructure_data.csv
+│   ├── raw/rescue_resources.csv
+│   ├── raw/weather_forecast_data.csv
+│   ├── raw/predictions.csv
+│   ├── raw/station_master_reference.csv
+│   ├── raw/cwc_station_reference.csv
+│   ├── processed/flood_training_feature_store.csv
+│   └── demo/
+├── backend/
+│   ├── requirements.txt
+│   ├── Dockerfile
+│   ├── app/main.py
+│   ├── app/config.py
+│   ├── app/api/sanket.py
+│   ├── app/api/marg.py
+│   ├── app/api/sahay.py
+│   ├── app/api/rahat.py
+│   ├── app/api/smriti.py
+│   ├── app/api/setucore.py
+│   ├── app/api/chetna.py
+│   ├── app/api/sahayak.py
+│   ├── app/api/awaaz.py
+│   ├── app/api/punarvas.py
+│   ├── app/api/disha.py
+│   ├── app/api/drishti.py
+│   └── tests/test_api.py
+├── frontend/
+│   ├── package.json
+│   ├── Dockerfile
+│   ├── src/App.jsx
+│   ├── src/App.css
+│   ├── src/pages/Drishti.jsx
+│   ├── src/pages/Sanket.jsx
+│   ├── src/pages/Marg.jsx
+│   ├── src/pages/Sahay.jsx
+│   ├── src/pages/Rahat.jsx
+│   ├── src/pages/Smriti.jsx
+│   ├── src/pages/SetuCore.jsx
+│   ├── src/pages/Chetna.jsx
+│   ├── src/pages/Sahayak.jsx
+│   ├── src/pages/Awaaz.jsx
+│   ├── src/pages/Punarvas.jsx
+│   └── src/pages/Disha.jsx
+├── ml/
+│   ├── data_generation/synthetic_data_generator.py
+│   ├── data_generation/feature_store_generator.py
+│   ├── training/train_baselines.py
+│   ├── training/train_physics_mlp.py
+│   ├── evaluation/validation_tests.py
+│   ├── evaluation/validation_figures.py
+│   ├── explainability/shap_analysis.py
+│   └── artifacts/
+│       ├── LogisticRegression.pkl
+│       ├── RandomForest.pkl
+│       ├── XGBoost.pkl
+│       ├── physics_mlp.pth
+│       ├── scaler.pkl
+│       └── feature_names.pkl
+├── results/
+│   ├── metrics/baseline_results.csv
+│   ├── metrics/physics_mlp_results.csv
+│   ├── metrics/validation_results.csv
+│   ├── metrics/feature_importance.csv
+│   ├── metrics/all_models_comparison.csv
+│   ├── figures/feature_importance.png
+│   ├── figures/feature_importance_comparison.png
+│   ├── figures/model_comparison.png
+│   └── figures/validation_results.png
+└── docs/
+    ├── paper/
+    ├── architecture/
+    └── api/
 
 ### 🧪 Testing
 
-cd backend
-python -m pytest tests/ -v
-9/9 tests passing ✅
+- cd backend
+- python -m pytest tests/ -v
+- 9/9 tests passing ✅
 
 ### 📊 Data
 14 Synthetic Datasets
@@ -199,26 +235,29 @@ Train: 5,008 | Validation: 1,252 | Test: 1,252
 Labels: Balanced (50/50 split)
 
 ### 🔬 Research Backing
+
 Aapadmitra addresses gaps identified in 7+ peer-reviewed papers:
 
-Paper	Key Insight
-Mosavi et al. (2018)	ML outperforms conventional models
-Raissi et al. (2019)	PINNs = Physics + ML
-Ren et al. (2025)	PINNs evolution
-Peng et al. (2025)	Uncertainty is critical
-Kumar et al. (2026)	SHAP validates interpretability
-Rijal et al. (2026)	Hybrid AI-physics recommended
-Arinze et al. (2025)	End-to-end systems validated
+| Paper | Key Insight |
+|-------|-------------|
+| Mosavi et al. (2018) | ML outperforms conventional models |
+| Raissi et al. (2019) | PINNs = Physics + ML |
+| Ren et al. (2025) | PINNs evolution |
+| Peng et al. (2025) | Uncertainty is critical |
+| Kumar et al. (2026) | SHAP validates interpretability |
+| Rijal et al. (2026) | Hybrid AI-physics recommended |
+| Arinze et al. (2025) | End-to-end systems validated |
 
 ### 🏆 Competitive Advantages
 
-Feature	Existing	Aapadmitra
-Level	District/Station	Village-Level ✅
-Uncertainty	❌ None	Confidence Intervals ✅
-Action Plan	❌ None	12 Modules ✅
-Physics	❌ None	Physics-Guided MLP ✅
-Explainability	❌ None	Feature Importance ✅
-End-to-End	❌ None	Prediction → Action ✅
+| Feature | Existing Systems | Aapadmitra |
+|---------|------------------|------------|
+| **Level** | District/Station | **Village-Level** ✅ |
+| **Uncertainty** | ❌ None | **Confidence Intervals** ✅ |
+| **Action Plan** | ❌ None | **12 Modules** ✅ |
+| **Physics** | ❌ None | **Physics-Guided MLP** ✅ |
+| **Explainability** | ❌ None | **Feature Importance** ✅ |
+| **End-to-End** | ❌ None | **Prediction → Action** ✅ |
 
 ### 📅 Built For
 SIH 2026 — Smart India Hackathon
@@ -227,10 +266,10 @@ Team: 6 Members
 Deadline: 16 September 2026
 
 ### 🗺️ Post-Hackathon Roadmap
-Phase	Timeline	Activity
-Phase 1	1-3 Months	Real data integration (IMD/CWC)
-Phase 2	3-6 Months	Pilot in 1 Assam district
-Phase 3	6-12 Months	Scale with ASDMA
+- Phase	Timeline	Activity
+- Phase 1	1-3 Months	Real data integration (IMD/CWC)
+- Phase 2	3-6 Months	Pilot in 1 Assam district
+- Phase 3	6-12 Months	Scale with ASDMA
 
 ### 👤 License
 MIT
