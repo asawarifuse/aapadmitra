@@ -1,11 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const Marg = () => {
+  const [villages, setVillages] = useState([]);
   const [villageId, setVillageId] = useState('');
   const [shelterId, setShelterId] = useState('1');
   const [route, setRoute] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    axios.get('http://localhost:8000/api/v1/villages')
+      .then(res => setVillages(res.data))
+      .catch(err => console.log(err));
+  }, []);
 
   const handleRoute = async () => {
     if (!villageId) return;
@@ -16,77 +23,99 @@ const Marg = () => {
         shelter_id: parseInt(shelterId)
       });
       setRoute(res.data);
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setLoading(false);
-    }
+    } catch (err) { console.log(err); }
+    finally { setLoading(false); }
   };
 
-  const getRoadColor = (c) => {
-    const colors = { good: '#4caf50', fair: '#ffeb3b', poor: '#ff9800', flooded: '#f44336' };
-    return colors[c] || '#999';
-  };
+  const roadColor = (c) => ({ good: '#4caf50', fair: '#ffeb3b', poor: '#ff9800', flooded: '#f44336' }[c] || '#999');
+  const riskColor = (r) => r > 0.6 ? '#f44336' : r > 0.3 ? '#ff9800' : '#4caf50';
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>🗺️ Marg — Safe Route Finder</h1>
-      <p style={styles.subtitle}>Find the safest evacuation route from village to shelter</p>
-
-      <div style={styles.panel}>
-        <div style={styles.row}>
-          <div style={styles.group}>
-            <label style={styles.label}>Village ID</label>
-            <input 
-              type="number" 
-              value={villageId} 
-              onChange={(e) => setVillageId(e.target.value)}
-              placeholder="Enter village ID"
-              style={styles.input}
-            />
-          </div>
-          <div style={styles.group}>
-            <label style={styles.label}>Shelter ID</label>
-            <input 
-              type="number" 
-              value={shelterId} 
-              onChange={(e) => setShelterId(e.target.value)}
-              style={styles.input}
-            />
-          </div>
+    <div style={s.container}>
+      <div style={s.hero}>
+        <div>
+          <h1 style={s.heroTitle}>🗺️ Marg</h1>
+          <p style={s.heroSub}>Find the safest evacuation route from village to shelter</p>
         </div>
-        <button onClick={handleRoute} disabled={!villageId || loading} style={styles.btn}>
-          {loading ? '🔄 Finding Route...' : '🗺️ Find Safe Route'}
+        <div style={s.heroBadge}>🛣️ Real-Time Risk Routing</div>
+      </div>
+
+      <div style={s.panel}>
+        <div style={s.row}>
+          <div style={s.field}>
+            <label style={s.label}>Select Village</label>
+            <select value={villageId} onChange={e => setVillageId(e.target.value)} style={s.input}>
+              <option value="">Choose a village...</option>
+              {villages.slice(0, 50).map(v => (
+                <option key={v.village_id} value={v.village_id}>
+                  {v.village_name} — {v.district}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div style={s.field}>
+  <label style={s.label}>Select Shelter</label>
+  <select value={shelterId} onChange={e => setShelterId(e.target.value)} style={s.input}>
+    <option value="1">Shelter A — Barpeta</option>
+    <option value="2">Shelter B — Barpeta</option>
+    <option value="3">Shelter C — Barpeta</option>
+    <option value="4">Shelter D — Barpeta</option>
+    <option value="5">Shelter E — Barpeta</option>
+  </select>
+</div>
+        </div>
+        <button onClick={handleRoute} disabled={!villageId || loading} style={s.btn}>
+          {loading ? '🔄 Computing Route...' : '🗺️ Find Safe Route'}
         </button>
       </div>
 
       {route && (
-        <div style={styles.results}>
-          <div style={styles.stats}>
-            <Metric label="Distance" value={`${route.route_distance_km} km`} />
-            <Metric label="Est. Time" value={`${route.estimated_time_min} min`} />
-            <Metric label="Flood Risk" value={route.flood_risk_score} color={
-              route.flood_risk_score > 0.6 ? '#f44336' : 
-              route.flood_risk_score > 0.3 ? '#ff9800' : '#4caf50'
-            } />
+        <div style={s.results}>
+          <div style={s.statsRow}>
+            <StatCard icon="📍" label="Distance" value={`${route.route_distance_km} km`} color="#1a237e" />
+            <StatCard icon="⏱️" label="Estimated Time" value={`${route.estimated_time_min} min`} color="#2196f3" />
+            <StatCard icon="⚠️" label="Flood Risk" value={route.flood_risk_score} color={riskColor(route.flood_risk_score)} />
+            <StatCard icon="🛤️" label="Waypoints" value={route.safe_route.length} color="#4caf50" />
           </div>
 
-          <h3 style={styles.sectionTitle}>Route Waypoints</h3>
-          <div style={styles.waypoints}>
-            {route.safe_route.map((wp, i) => (
-              <div key={i} style={styles.waypoint}>
-                <div style={styles.wpNumber}>{i + 1}</div>
-                <div style={styles.wpDetails}>
-                  <div style={styles.wpCoord}>📍 {wp.lat.toFixed(4)}, {wp.lon.toFixed(4)}</div>
-                  <div style={styles.wpMeta}>
-                    <span style={{...styles.roadBadge, background: getRoadColor(wp.road_condition)}}>
-                      {wp.road_condition.toUpperCase()}
-                    </span>
-                    <span style={styles.wpRisk}>Flood Risk: {(wp.flood_risk * 100).toFixed(0)}%</span>
+          <div style={s.section}>
+            <h3 style={s.sectionTitle}>🗺️ Route Waypoints</h3>
+            <div style={s.timeline}>
+              {route.safe_route.map((wp, i) => (
+                <div key={i} style={s.wpItem}>
+                  <div style={s.wpLine}>
+                    <div style={s.wpDot}>{i + 1}</div>
+                    {i < route.safe_route.length - 1 && <div style={s.wpConnector}></div>}
+                  </div>
+                  <div style={s.wpCard}>
+                    <div style={s.wpHeader}>
+                      <span style={s.wpCoord}>📍 {wp.lat.toFixed(4)}, {wp.lon.toFixed(4)}</span>
+                      <span style={{...s.roadBadge, background: roadColor(wp.road_condition)}}>
+                        {wp.road_condition.toUpperCase()}
+                      </span>
+                    </div>
+                    <div style={s.wpRiskRow}>
+                      <span style={s.wpRiskLabel}>Flood Risk</span>
+                      <div style={s.wpRiskTrack}>
+                        <div style={{...s.wpRiskFill, width: `${wp.flood_risk * 100}%`, background: riskColor(wp.flood_risk)}}></div>
+                      </div>
+                      <span style={s.wpRiskValue}>{(wp.flood_risk * 100).toFixed(0)}%</span>
+                    </div>
                   </div>
                 </div>
+              ))}
+            </div>
+          </div>
+
+          <div style={s.summaryBox}>
+            <div style={s.summaryIcon}>✅</div>
+            <div>
+              <div style={s.summaryTitle}>Route Recommended</div>
+              <div style={s.summaryText}>
+                This route avoids {route.safe_route.filter(w => w.road_condition === 'flooded').length} flooded sections.
+                Estimated travel time is {route.estimated_time_min} minutes.
               </div>
-            ))}
+            </div>
           </div>
         </div>
       )}
@@ -94,37 +123,54 @@ const Marg = () => {
   );
 };
 
-const Metric = ({ label, value, color }) => (
-  <div style={styles.metric}>
-    <div style={styles.metricLabel}>{label}</div>
-    <div style={{...styles.metricValue, color: color || '#1a2332'}}>{value}</div>
+const StatCard = ({ icon, label, value, color }) => (
+  <div style={{...s.statCard, borderLeft: `4px solid ${color}`}}>
+    <div style={s.statIcon}>{icon}</div>
+    <div>
+      <div style={s.statLabel}>{label}</div>
+      <div style={{...s.statValue, color}}>{value}</div>
+    </div>
   </div>
 );
 
-const styles = {
-  container: { padding: '24px', maxWidth: '900px', margin: '0 auto' },
-  title: { fontSize: '28px', color: '#1a2332', marginBottom: '4px' },
-  subtitle: { color: '#5a6a7e', fontSize: '14px', marginBottom: '24px' },
-  panel: { background: 'white', padding: '24px', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', marginBottom: '24px' },
-  row: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' },
-  group: { display: 'flex', flexDirection: 'column' },
-  label: { fontSize: '13px', fontWeight: '600', marginBottom: '6px', color: '#1a2332' },
-  input: { padding: '10px', border: '1px solid #d0d7e2', borderRadius: '8px', fontSize: '14px' },
-  btn: { width: '100%', padding: '12px', background: '#1a237e', color: 'white', border: 'none', borderRadius: '8px', fontSize: '15px', fontWeight: '600', cursor: 'pointer' },
-  results: { background: 'white', padding: '24px', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' },
-  stats: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '24px' },
-  metric: { textAlign: 'center', padding: '12px', background: '#f8f9fb', borderRadius: '8px' },
-  metricLabel: { fontSize: '12px', color: '#5a6a7e', marginBottom: '4px' },
-  metricValue: { fontSize: '20px', fontWeight: '700' },
-  sectionTitle: { fontSize: '16px', color: '#1a2332', marginBottom: '12px' },
-  waypoints: { display: 'flex', flexDirection: 'column', gap: '10px' },
-  waypoint: { display: 'flex', gap: '12px', padding: '12px', background: '#f8f9fb', borderRadius: '8px' },
-  wpNumber: { width: '32px', height: '32px', borderRadius: '50%', background: '#1a237e', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', flexShrink: 0 },
-  wpDetails: { flex: 1 },
-  wpCoord: { fontSize: '13px', fontWeight: '500', marginBottom: '4px' },
-  wpMeta: { display: 'flex', gap: '12px', alignItems: 'center' },
-  roadBadge: { fontSize: '10px', color: 'white', padding: '2px 8px', borderRadius: '10px', fontWeight: '600' },
-  wpRisk: { fontSize: '11px', color: '#5a6a7e' }
+const s = {
+  container: { padding: '24px', background: '#f5f7fa', minHeight: '100vh' },
+  hero: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' },
+  heroTitle: { fontSize: '32px', fontWeight: '800', color: '#1a2332', marginBottom: '4px' },
+  heroSub: { fontSize: '14px', color: '#1a2332', fontWeight: '500' },
+  heroBadge: { padding: '8px 16px', background: 'linear-gradient(135deg, #1a237e, #4fc3f7)', color: '#ffffff', borderRadius: '20px', fontSize: '12px', fontWeight: '700' },
+  panel: { background: '#ffffff', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', marginBottom: '24px' },
+  row: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' },
+  field: { display: 'flex', flexDirection: 'column' },
+  label: { fontSize: '13px', fontWeight: '700', marginBottom: '8px', color: '#1a2332' },
+  input: { padding: '12px', border: '2px solid #e8ecf1', borderRadius: '10px', fontSize: '14px', background: '#f8f9fb', color: '#1a2332' },
+  btn: { width: '100%', padding: '16px', background: 'linear-gradient(135deg, #1a237e, #283593)', color: '#ffffff', border: 'none', borderRadius: '12px', fontSize: '16px', fontWeight: '700', cursor: 'pointer', boxShadow: '0 4px 12px rgba(26,35,126,0.3)' },
+  results: { background: '#ffffff', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', padding: '24px' },
+  statsRow: { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' },
+  statCard: { background: '#f8f9fb', padding: '18px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px' },
+  statIcon: { fontSize: '26px' },
+  statLabel: { fontSize: '11px', color: '#1a2332', fontWeight: '600', marginBottom: '4px', textTransform: 'uppercase' },
+  statValue: { fontSize: '20px', fontWeight: '800' },
+  section: { marginBottom: '24px' },
+  sectionTitle: { fontSize: '16px', fontWeight: '700', color: '#1a2332', marginBottom: '16px' },
+  timeline: { display: 'flex', flexDirection: 'column', gap: '12px' },
+  wpItem: { display: 'flex', gap: '16px' },
+  wpLine: { display: 'flex', flexDirection: 'column', alignItems: 'center' },
+  wpDot: { width: '36px', height: '36px', borderRadius: '50%', background: '#1a237e', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '800', flexShrink: 0, fontSize: '14px' },
+  wpConnector: { width: '3px', flex: 1, background: '#e8ecf1', marginTop: '4px' },
+  wpCard: { flex: 1, background: '#f8f9fb', padding: '14px', borderRadius: '10px', marginBottom: '8px' },
+  wpHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' },
+  wpCoord: { fontSize: '14px', fontWeight: '600', color: '#1a2332' },
+  roadBadge: { fontSize: '10px', color: '#ffffff', padding: '4px 10px', borderRadius: '10px', fontWeight: '700' },
+  wpRiskRow: { display: 'flex', alignItems: 'center', gap: '10px' },
+  wpRiskLabel: { fontSize: '12px', color: '#1a2332', fontWeight: '600', minWidth: '80px' },
+  wpRiskTrack: { flex: 1, height: '6px', background: '#e8ecf1', borderRadius: '3px', overflow: 'hidden' },
+  wpRiskFill: { height: '100%', borderRadius: '3px', transition: 'width 0.5s' },
+  wpRiskValue: { fontSize: '12px', fontWeight: '700', color: '#1a2332', minWidth: '40px', textAlign: 'right' },
+  summaryBox: { padding: '20px', background: 'linear-gradient(135deg, #e8f5e9, #f1f8e9)', borderRadius: '12px', display: 'flex', gap: '16px', alignItems: 'center' },
+  summaryIcon: { fontSize: '32px' },
+  summaryTitle: { fontSize: '15px', fontWeight: '700', color: '#2e7d32', marginBottom: '4px' },
+  summaryText: { fontSize: '13px', color: '#1b5e20' }
 };
 
 export default Marg;

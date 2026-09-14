@@ -1,11 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const Rahat = () => {
+  const [villages, setVillages] = useState([]);
   const [villageId, setVillageId] = useState('');
   const [population, setPopulation] = useState('1000');
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    axios.get('http://localhost:8000/api/v1/villages')
+      .then(res => setVillages(res.data))
+      .catch(err => console.log(err));
+  }, []);
 
   const handleAllocate = async () => {
     if (!villageId) return;
@@ -16,11 +23,8 @@ const Rahat = () => {
         affected_population: parseInt(population)
       });
       setData(res.data);
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setLoading(false);
-    }
+    } catch (err) { console.log(err); }
+    finally { setLoading(false); }
   };
 
   const supplies = data ? [
@@ -32,43 +36,91 @@ const Rahat = () => {
   ] : [];
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>📦 Rahat — Relief Allocation</h1>
-      <p style={styles.subtitle}>Allocate relief supplies based on affected population</p>
+    <div style={s.container}>
+      <div style={s.hero}>
+        <div>
+          <h1 style={s.heroTitle}>📦 Rahat</h1>
+          <p style={s.heroSub}>Allocate relief supplies based on affected population</p>
+        </div>
+        <div style={s.heroBadge}>📦 Smart Allocation</div>
+      </div>
 
-      <div style={styles.panel}>
-        <div style={styles.row}>
-          <div style={styles.group}>
-            <label style={styles.label}>Village ID</label>
-            <input type="number" value={villageId} onChange={e => setVillageId(e.target.value)}
-              placeholder="Enter village ID" style={styles.input} />
+      <div style={s.panel}>
+        <div style={s.row}>
+          <div style={s.field}>
+            <label style={s.label}>Select Village</label>
+            <select value={villageId} onChange={e => setVillageId(e.target.value)} style={s.input}>
+              <option value="">Choose a village...</option>
+              {villages.slice(0, 50).map(v => (
+                <option key={v.village_id} value={v.village_id}>
+                  {v.village_name} — {v.district}
+                </option>
+              ))}
+            </select>
           </div>
-          <div style={styles.group}>
-            <label style={styles.label}>Affected Population</label>
-            <input type="number" value={population} onChange={e => setPopulation(e.target.value)} style={styles.input} />
+          <div style={s.field}>
+            <label style={s.label}>Affected Population</label>
+            <input type="number" value={population} onChange={e => setPopulation(e.target.value)} style={s.input} />
           </div>
         </div>
-        <button onClick={handleAllocate} disabled={!villageId || loading} style={styles.btn}>
+        <button onClick={handleAllocate} disabled={!villageId || loading} style={s.btn}>
           {loading ? '🔄 Allocating...' : '📦 Allocate Relief'}
         </button>
       </div>
 
       {data && (
-        <div style={styles.results}>
-          <div style={styles.summary}>
-            <Metric label="Total Weight" value={`${data.total_weight_kg} kg`} />
-            <Metric label="Delivery Vehicles" value={data.delivery_vehicles} />
+        <div style={s.results}>
+          <div style={s.statsRow}>
+            <StatCard icon="⚖️" label="Total Weight" value={`${data.total_weight_kg.toLocaleString()} kg`} color="#1a237e" />
+            <StatCard icon="🚛" label="Delivery Vehicles" value={data.delivery_vehicles} color="#2196f3" />
+            <StatCard icon="👥" label="Population Served" value={parseInt(population).toLocaleString()} color="#4caf50" />
+            <StatCard icon="📦" label="Total Items" value={(data.food_packets + data.water_units + data.medical_kits + data.tarpaulins + data.blankets).toLocaleString()} color="#ff9800" />
           </div>
 
-          <h3 style={styles.sectionTitle}>Supplies</h3>
-          <div style={styles.supplies}>
-            {supplies.map((s, i) => (
-              <div key={i} style={{...styles.supplyCard, borderLeft: `4px solid ${s.color}`}}>
-                <div style={styles.supplyIcon}>{s.icon}</div>
-                <div style={styles.supplyValue}>{s.value.toLocaleString()}</div>
-                <div style={styles.supplyLabel}>{s.label}</div>
+          <div style={s.section}>
+            <h3 style={s.sectionTitle}>📦 Relief Supplies Allocation</h3>
+            <div style={s.suppliesGrid}>
+              {supplies.map((sup, i) => (
+                <div key={i} style={{...s.supplyCard, borderTop: `4px solid ${sup.color}`}}>
+                  <div style={s.supplyIcon}>{sup.icon}</div>
+                  <div style={s.supplyValue}>{sup.value.toLocaleString()}</div>
+                  <div style={s.supplyLabel}>{sup.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div style={s.section}>
+            <h3 style={s.sectionTitle}>🚛 Delivery Plan</h3>
+            <div style={s.deliveryCard}>
+              <div style={s.deliveryRow}>
+                <span style={s.deliveryLabel}>Vehicles Required</span>
+                <span style={s.deliveryValue}>{data.delivery_vehicles} trucks</span>
               </div>
-            ))}
+              <div style={s.deliveryRow}>
+                <span style={s.deliveryLabel}>Total Cargo Weight</span>
+                <span style={s.deliveryValue}>{data.total_weight_kg.toLocaleString()} kg</span>
+              </div>
+              <div style={s.deliveryRow}>
+                <span style={s.deliveryLabel}>Estimated Delivery</span>
+                <span style={s.deliveryValue}>24-36 hours</span>
+              </div>
+              <div style={s.deliveryRow}>
+                <span style={s.deliveryLabel}>Priority Level</span>
+                <span style={{...s.deliveryValue, color: '#f44336'}}>HIGH</span>
+              </div>
+            </div>
+          </div>
+
+          <div style={s.summaryBox}>
+            <div style={s.summaryIcon}>✅</div>
+            <div>
+              <div style={s.summaryTitle}>Relief Package Ready</div>
+              <div style={s.summaryText}>
+                Supplies for {parseInt(population).toLocaleString()} people are ready.
+                Total weight: {data.total_weight_kg.toLocaleString()} kg across {data.delivery_vehicles} vehicles.
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -76,34 +128,49 @@ const Rahat = () => {
   );
 };
 
-const Metric = ({ label, value }) => (
-  <div style={styles.metric}>
-    <div style={styles.metricLabel}>{label}</div>
-    <div style={styles.metricValue}>{value}</div>
+const StatCard = ({ icon, label, value, color }) => (
+  <div style={{...s.statCard, borderLeft: `4px solid ${color}`}}>
+    <div style={s.statIcon}>{icon}</div>
+    <div>
+      <div style={s.statLabel}>{label}</div>
+      <div style={{...s.statValue, color}}>{value}</div>
+    </div>
   </div>
 );
 
-const styles = {
-  container: { padding: '24px', maxWidth: '900px', margin: '0 auto' },
-  title: { fontSize: '28px', color: '#1a2332', marginBottom: '4px' },
-  subtitle: { color: '#5a6a7e', fontSize: '14px', marginBottom: '24px' },
-  panel: { background: 'white', padding: '24px', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', marginBottom: '24px' },
-  row: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' },
-  group: { display: 'flex', flexDirection: 'column' },
-  label: { fontSize: '13px', fontWeight: '600', marginBottom: '6px' },
-  input: { padding: '10px', border: '1px solid #d0d7e2', borderRadius: '8px', fontSize: '14px' },
-  btn: { width: '100%', padding: '12px', background: '#1a237e', color: 'white', border: 'none', borderRadius: '8px', fontSize: '15px', fontWeight: '600', cursor: 'pointer' },
-  results: { background: 'white', padding: '24px', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' },
-  summary: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '24px' },
-  metric: { textAlign: 'center', padding: '16px', background: '#f8f9fb', borderRadius: '8px' },
-  metricLabel: { fontSize: '12px', color: '#5a6a7e', marginBottom: '4px' },
-  metricValue: { fontSize: '24px', fontWeight: '700', color: '#1a237e' },
-  sectionTitle: { fontSize: '16px', marginBottom: '12px' },
-  supplies: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px' },
-  supplyCard: { padding: '16px', background: '#f8f9fb', borderRadius: '8px', textAlign: 'center' },
-  supplyIcon: { fontSize: '28px', marginBottom: '8px' },
-  supplyValue: { fontSize: '20px', fontWeight: '700', color: '#1a2332', marginBottom: '4px' },
-  supplyLabel: { fontSize: '12px', color: '#5a6a7e' }
+const s = {
+  container: { padding: '24px', background: '#f5f7fa', minHeight: '100vh' },
+  hero: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' },
+  heroTitle: { fontSize: '32px', fontWeight: '800', color: '#1a2332', marginBottom: '4px' },
+  heroSub: { fontSize: '14px', color: '#1a2332', fontWeight: '500' },
+  heroBadge: { padding: '8px 16px', background: 'linear-gradient(135deg, #1a237e, #4fc3f7)', color: '#ffffff', borderRadius: '20px', fontSize: '12px', fontWeight: '700' },
+  panel: { background: '#ffffff', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', marginBottom: '24px' },
+  row: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' },
+  field: { display: 'flex', flexDirection: 'column' },
+  label: { fontSize: '13px', fontWeight: '700', marginBottom: '8px', color: '#1a2332' },
+  input: { padding: '12px', border: '2px solid #e8ecf1', borderRadius: '10px', fontSize: '14px', background: '#f8f9fb', color: '#1a2332' },
+  btn: { width: '100%', padding: '16px', background: 'linear-gradient(135deg, #1a237e, #283593)', color: '#ffffff', border: 'none', borderRadius: '12px', fontSize: '16px', fontWeight: '700', cursor: 'pointer', boxShadow: '0 4px 12px rgba(26,35,126,0.3)' },
+  results: { background: '#ffffff', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', padding: '24px' },
+  statsRow: { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' },
+  statCard: { background: '#f8f9fb', padding: '18px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px' },
+  statIcon: { fontSize: '26px' },
+  statLabel: { fontSize: '11px', color: '#1a2332', fontWeight: '600', marginBottom: '4px', textTransform: 'uppercase' },
+  statValue: { fontSize: '20px', fontWeight: '800' },
+  section: { marginBottom: '24px' },
+  sectionTitle: { fontSize: '16px', fontWeight: '700', color: '#1a2332', marginBottom: '16px' },
+  suppliesGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '16px' },
+  supplyCard: { background: '#f8f9fb', padding: '20px', borderRadius: '12px', textAlign: 'center' },
+  supplyIcon: { fontSize: '36px', marginBottom: '10px' },
+  supplyValue: { fontSize: '24px', fontWeight: '800', color: '#1a2332', marginBottom: '4px' },
+  supplyLabel: { fontSize: '12px', color: '#1a2332', fontWeight: '600' },
+  deliveryCard: { background: '#f8f9fb', padding: '20px', borderRadius: '12px' },
+  deliveryRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid #e8ecf1' },
+  deliveryLabel: { fontSize: '13px', color: '#1a2332', fontWeight: '600' },
+  deliveryValue: { fontSize: '14px', fontWeight: '700', color: '#1a237e' },
+  summaryBox: { padding: '20px', background: 'linear-gradient(135deg, #e8f5e9, #f1f8e9)', borderRadius: '12px', display: 'flex', gap: '16px', alignItems: 'center' },
+  summaryIcon: { fontSize: '32px' },
+  summaryTitle: { fontSize: '15px', fontWeight: '700', color: '#2e7d32', marginBottom: '4px' },
+  summaryText: { fontSize: '13px', color: '#1b5e20' }
 };
 
 export default Rahat;
