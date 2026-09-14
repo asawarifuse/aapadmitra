@@ -2,13 +2,13 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-# Install build tools for Python packages that need compilation
+# Install build essentials
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# CRITICAL: Install setuptools + wheel BEFORE requirements
-RUN pip install --upgrade pip setuptools wheel
+# Upgrade pip and install modern setuptools FIRST
+RUN pip install --upgrade pip "setuptools>=68" wheel
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
